@@ -5,7 +5,7 @@ from security.auth_handler import encrypt_password
 
 def init_data():
     Base.metadata.create_all(engine)
-    init_admin()
+    # init_admin()
 
 
 def init_admin():

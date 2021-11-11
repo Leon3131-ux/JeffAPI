@@ -1,34 +1,17 @@
 from datetime import timedelta, datetime
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from data.database import session as db
 from data.models import User
+from errorresponses.error_responses import authentication_exception, authorization_exception
 
 SECRET_KEY = "veryCoolSecret"
 EXPIRES_MINUTES = 60
 ALGORITHM = "HS256"
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-authorization_exception = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN,
-    detail="Could Not Validate Token",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
-forbidden_exception = HTTPException(
-    status_code=status.HTTP_403_FORBIDDEN,
-    detail="Could Not Validate Token",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
-authentication_exception = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

@@ -12,10 +12,17 @@ class User(Base):
 
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     is_admin = Column(Boolean(255), nullable=False, name="is_admin")
+
+
+class Question(Base):
+    __tablename__ = "question"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    question = Column(String(255), nullable=False)
 
 
 class AuthModel(BaseModel):
@@ -23,7 +30,15 @@ class AuthModel(BaseModel):
     password: str
 
 
-class NewUserModel(BaseModel):
+class UserDto(BaseModel):
     username: str
     password: str
     isAdmin: bool
+
+
+class QuestionDto(BaseModel):
+    id: int
+    question: str
+
+    class Config:
+        orm_mode = True
