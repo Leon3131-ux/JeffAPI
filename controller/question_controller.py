@@ -31,3 +31,15 @@ async def save_question(question_dto: QuestionDto, current_user: User = Depends(
         return question
     else:
         raise forbidden_exception
+
+
+@router.delete("/api/question/delete/{question_id}")
+async def delete_question(question_id: int, current_user: User = Depends(get_current_user)):
+    if current_user.is_admin:
+        question = db.query(Question).filter(Question.id == question_id).first()
+        if question is not None:
+            db.delete(question)
+            db.commit()
+    else:
+        raise forbidden_exception
+
