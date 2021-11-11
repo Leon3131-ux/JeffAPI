@@ -9,12 +9,21 @@ from data.database import session as db
 router = APIRouter()
 
 
-@router.get("/api/question", response_model=QuestionDto)
+@router.get("/api/question/get", response_model=QuestionDto)
 async def get_question(current_user: User = Depends(get_current_user)):
     question = db.query(Question).order_by(func.rand()).first()
     if question is not None:
         return question
     raise no_data_exception
+
+
+@router.get("/api/question/get/all", response_model=QuestionDto)
+async def get_questions(current_user: User = Depends(get_current_user)):
+    if current_user.is_admin:
+        questions = db.query(Question).all()
+        return questions
+    else:
+        raise forbidden_exception
 
 
 @router.post("/api/question/save", response_model=QuestionDto)
@@ -42,4 +51,3 @@ async def delete_question(question_id: int, current_user: User = Depends(get_cur
             db.commit()
     else:
         raise forbidden_exception
-
