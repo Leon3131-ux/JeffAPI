@@ -1,4 +1,7 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from typing import List, Optional
+
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 
 from data.database import Base
 from pydantic import BaseModel
@@ -16,6 +19,7 @@ class User(Base):
     username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     is_admin = Column(Boolean(255), nullable=False, name="is_admin")
+    question_ratings = relationship("QuestionRating")
 
 
 class Question(Base):
@@ -23,11 +27,33 @@ class Question(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     question = Column(String(255), nullable=False)
+    question_ratings = relationship("QuestionRating")
+
+
+class QuestionRating(Base):
+    __tablename__ = "question_rating"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", back_populates="question_ratings")
+    question_id = Column(Integer, ForeignKey("question.id"), nullable=False)
+    question = relationship("Question", back_populates="question_ratings")
+    rating = Column(Integer, nullable=False)
 
 
 class AuthModel(BaseModel):
     username: str
     password: str
+
+
+class QuestionRatingOut(BaseModel):
+    question_id: int
+    question: str
+    user_id: int
+    rating: int
+
+    class Config:
+        orm_mode = True
 
 
 class UserDto(BaseModel):
@@ -46,3 +72,8 @@ class QuestionDto(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class QuestionRatingIn(BaseModel):
+    question_id: int
+    rating: int
