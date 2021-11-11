@@ -13,9 +13,9 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-    is_admin = Column(Boolean, nullable=False, name="is_admin")
+    username = Column(String(255), nullable=False, unique=True)
+    password = Column(String(255), nullable=False)
+    is_admin = Column(Boolean(255), nullable=False, name="is_admin")
 
 
 class AuthModel(BaseModel):

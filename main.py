@@ -1,10 +1,13 @@
 import uvicorn
 from fastapi import FastAPI
 from controller import auth_controller, user_controller
+from data.data_init import init_data
 
 app = FastAPI()
 app.include_router(auth_controller.router)
 app.include_router(user_controller.router)
+
+init_data()
 
 
 @app.get("/")
