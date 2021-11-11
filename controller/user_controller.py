@@ -1,35 +1,51 @@
 from fastapi import APIRouter, Depends
+from typing import List
 
 from data.models import User, UserDto
-from errorresponses.error_responses import forbidden_exception
+from errorresponses.error_responses import forbidden_exception, bad_request
 from security.auth_handler import get_current_user, encrypt_password
-from data.database import session
+from data.database import session as db
 
 router = APIRouter()
 
 
-@router.post("/api/user/create")
-async def create_user(user_dto: UserDto, current_user: User = Depends(get_current_user)):
+@router.get("/api/user/get", response_model=List[UserDto], response_model_exclude={"password"})
+async def get_users(current_user: User = Depends(get_current_user)):
     if current_user.is_admin:
-
-        session.add(User(
-            user_dto.username,
-            encrypt_password(user_dto.password),
-            user_dto.isAdmin
-        ))
-        session.commit()
+        users = db.query(User).all()
+        return users
     else:
         raise forbidden_exception
 
 
-@router.post("/api/user/update")
+@router.post("/api/user/save", response_model=UserDto, response_model_exclude={"password"})
 async def save_user(user_dto: UserDto, current_user: User = Depends(get_current_user)):
     if current_user.is_admin:
-        matching_user = session.query(User).filter(User.username == user_dto.username).first()
+        user = db.query(User).filter(User.id == user_dto.id).first()
+        if user is not None:
+            user.username = user_dto.username
+            user.password = user_dto.password
+            user.is_admin = user_dto.is_admin
+        else:
+            user_with_same_name = db.query(User).filter(User.id == user_dto.id).first()
+            if user_with_same_name is None:
+                user = User(username=user_dto.username, password=user_dto.password, is_admin=user_dto.is_admin)
+                db.add(user)
+                db.flush()
+            else:
+                raise bad_request
+        db.commit()
+        return user
+    else:
+        raise forbidden_exception
+
+
+@router.delete("/api/user/delete/{user_id}")
+async def delete_user(user_id: int, current_user: User = Depends(get_current_user)):
+    if current_user.is_admin:
+        matching_user = db.query(User).filter(User.id == user_id).first()
         if matching_user is not None:
-            matching_user.username = user_dto.username
-            matching_user.password = user_dto.password
-            matching_user.is_admin = user_dto.isAdmin
-            session.commit()
+            db.delete(matching_user)
+            db.commit()
     else:
         raise forbidden_exception

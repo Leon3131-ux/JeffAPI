@@ -31,9 +31,13 @@ class AuthModel(BaseModel):
 
 
 class UserDto(BaseModel):
+    id: int
     username: str
     password: str
-    isAdmin: bool
+    is_admin: bool
+
+    class Config:
+        orm_mode = True
 
 
 class QuestionDto(BaseModel):

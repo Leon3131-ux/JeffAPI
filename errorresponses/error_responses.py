@@ -22,3 +22,7 @@ no_data_exception = HTTPException(
     status_code=status.HTTP_200_OK,
     detail=""
 )
+
+bad_request = HTTPException(
+    status_code=status.HTTP_400_BAD_REQUEST
+)
