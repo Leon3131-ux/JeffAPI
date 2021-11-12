@@ -28,6 +28,15 @@ async def get_questions(current_user: User = Depends(get_current_user)):
         raise forbidden_exception
 
 
+@router.get("/api/question/get/{id}", response_model=QuestionDto)
+async def get_questions(question_id: int, current_user: User = Depends(get_current_user)):
+    question = db.query(Question).filter(Question.id == question_id).first()
+    if question is not None:
+        return question
+    else:
+        raise no_data_exception
+
+
 @router.post("/api/question/save", response_model=QuestionDto)
 async def save_question(question_dto: QuestionDto, current_user: User = Depends(get_current_user)):
     if current_user.is_admin:
