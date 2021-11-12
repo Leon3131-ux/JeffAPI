@@ -27,7 +27,7 @@ async def save_user(user_dto: UserDto, current_user: User = Depends(get_current_
             user.password = user_dto.password
             user.is_admin = user_dto.is_admin
         else:
-            user_with_same_name = db.query(User).filter(User.id == user_dto.id).first()
+            user_with_same_name = db.query(User).filter(User.username == user_dto.username).first()
             if user_with_same_name is None:
                 user = User(username=user_dto.username, password=user_dto.password, is_admin=user_dto.is_admin)
                 db.add(user)

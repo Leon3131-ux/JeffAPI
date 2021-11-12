@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -19,7 +17,7 @@ class User(Base):
     username = Column(String(255), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     is_admin = Column(Boolean(255), nullable=False, name="is_admin")
-    question_ratings = relationship("QuestionRating")
+    question_ratings = relationship("QuestionRating", cascade='all,delete')
 
 
 class Question(Base):
@@ -27,18 +25,36 @@ class Question(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     question = Column(String(255), nullable=False)
-    question_ratings = relationship("QuestionRating")
+    question_ratings = relationship("QuestionRating", cascade='all,delete')
 
 
 class QuestionRating(Base):
     __tablename__ = "question_rating"
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete='CASCADE'), nullable=False)
     user = relationship("User", back_populates="question_ratings")
-    question_id = Column(Integer, ForeignKey("question.id"), nullable=False)
+    question_id = Column(Integer, ForeignKey("question.id", ondelete='CASCADE'), nullable=False)
     question = relationship("Question", back_populates="question_ratings")
     rating = Column(Integer, nullable=False)
+
+
+class QuestionLog(Base):
+    __tablename__ = "question_log"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    question_id = Column(Integer, nullable=False)
+    question = Column(String(255), nullable=False)
+    method = Column(String(255), nullable=False)
+
+
+class UserLog(Base):
+    __tablename__ = "user_log"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer, nullable=False)
+    username = Column(String(255), nullable=False)
+    method = Column(String(255), nullable=False)
 
 
 class AuthModel(BaseModel):

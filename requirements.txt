@@ -6,3 +6,4 @@ python_jose==3.3.0
 SQLAlchemy==1.4.26
 uvicorn==0.15.0
 bcrypt==3.2.0
+cryptography==35.0.0

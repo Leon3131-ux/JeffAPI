@@ -32,15 +32,13 @@ def create_token(username: str, password: str):
 
 
 async def get_current_user(jwt_token: str = Depends(oauth2_scheme)):
-    try:
-        decoded_jwt_token = jwt.decode(jwt_token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = decoded_jwt_token.get("sub")
-        matching_user = db.query(User).filter(User.username == username).first()
-        if matching_user is None:
-            raise authorization_exception
-        return matching_user
-    except JWTError:
+    decoded_jwt_token = jwt.decode(jwt_token, SECRET_KEY, algorithms=[ALGORITHM])
+    username = decoded_jwt_token.get("sub")
+    matching_user = db.query(User).filter(User.username == username).first()
+    if matching_user is None:
         raise authorization_exception
+    return matching_user
+
 
 
 def encrypt_password(password: str):
